@@ -86,8 +86,3 @@ plot(pred)
 fit = auto.arima(df1$Handy_Odessa_Agioi_30)
 pred = forecast(fit, 200)
 plot(pred)
-
-
-
-
-

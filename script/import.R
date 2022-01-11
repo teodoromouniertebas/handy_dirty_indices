@@ -43,32 +43,27 @@ p3
 df <- df %>%
   select(-c(2,3))
 
-df1 <- df %>%
-  select(-c(2,4))
 
 df <- df %>%
   mutate(Date = yearweek(Date)) %>%
   as_tsibble()
 
-df1 <- df1 %>%
-  mutate(Date = yearweek(Date)) %>%
-  as_tsibble()
 
-autoplot(df, Handy_Fawley_Rotterdam_30)
+autoplot(df, Handy_Lavera_Augusta_30)
 
 df %>% model(
-    classical_decomposition(Handy_Fawley_Rotterdam_30, type = "additive")
+    classical_decomposition(Handy_Lavera_Augusta_30, type = "additive")
   ) %>%
   components() %>%
   autoplot() +
   labs(title = "Classical additive decomposition")
 
 
-# Simple forcasting for Handy_Fawley_Rotterdam_30
+# Simple forcasting for Handy_Lavera_Augusta_30
 
 fit_df <- df %>%
   model(stlf = decomposition_model(
-    STL(Handy_Fawley_Rotterdam_30 ~ trend(window = 7), robust = TRUE),
+    STL(Handy_Lavera_Augusta_30 ~ trend(window = 7), robust = TRUE),
     NAIVE(season_adjust)
   ))
 

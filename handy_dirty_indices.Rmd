@@ -9,11 +9,14 @@ library(tidyverse)
 library(DT)
 library(plotly)
 library(shiny)
+library(stats)
+library(forecast)
 source("Handy_dirty_indices.R")
-IndChoices <- df %>%  select_if(is.numeric) %>% names()
 
-updatedf <- reactive(
-  df %>% select(!!! rlang::syms(input$Ind),"Date"))
+IndChoices <- df %>% dplyr::select_if(is.numeric) %>% names()
+
+updatedf <- reactive( df %>% dplyr::select(!!! rlang::syms(input$Ind),"Date"))
+updatets <- reactive( df %>% dplyr::select(!!! rlang::syms(input$Ind)) %>% ts(frequency = 52, start = c(2003, 6)))
 ```
 
 
@@ -40,15 +43,7 @@ renderPlotly({
 ### Forcast
 ```{r}
 renderPlot({
-fit_df <- updatedf() %>%
-  model(stlf = decomposition_model(
-    STL(!! rlang::sym(input$Ind) ~ trend(window = 7), robust = TRUE),
-    NAIVE(season_adjust)
-  ))
-
-fit_df %>%
-  forecast() %>%
-  autoplot(!! rlang::sym(input$Ind))
+updatets() %>% farima(52) %>% plot()
 })
 ```
 
