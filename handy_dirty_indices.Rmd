@@ -1,0 +1,69 @@
+---
+title: "Handy Dirty Indices"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(DT)
+library(plotly)
+library(shiny)
+source("Handy_dirty_indices.R")
+IndChoices <- df %>%  select_if(is.numeric) %>% names()
+
+updatedf <- reactive(
+  df %>% select(!!! rlang::syms(input$Ind),"Date"))
+```
+
+
+Column {.sidebar}
+------------------------------------------------------------------
+```{r}
+selectInput(inputId = "Ind",label = "Indices", choices = IndChoices)
+```
+
+Column {.tabset}
+------------------------------------------------------------------
+
+### indices
+```{r}
+renderPlotly({
+ p <- updatedf() %>%
+  ggplot(aes(x=Date,y=!! rlang::sym(input$Ind))) +
+  geom_line() + theme_minimal() + scale_y_continuous(breaks=seq(-60000,60000,10000))
+ ggplotly(p)
+})
+```
+
+
+### Forcast
+```{r}
+renderPlot({
+fit_df <- updatedf() %>%
+  model(stlf = decomposition_model(
+    STL(!! rlang::sym(input$Ind) ~ trend(window = 7), robust = TRUE),
+    NAIVE(season_adjust)
+  ))
+
+fit_df %>%
+  forecast() %>%
+  autoplot(!! rlang::sym(input$Ind))
+})
+```
+
+### Data
+```{r}
+renderDT(
+  updatedf(), rownames = F, extensions = 'Buttons', filter="top", editable=T,
+  options = list(
+    dom = 'Blfrtip',
+    buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+    lengthMenu = list(c(10,50,100,-1),c(10,50,100,"All"))
+  )
+)
+```
+
+
+
+
