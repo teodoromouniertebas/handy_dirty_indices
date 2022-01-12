@@ -27,6 +27,19 @@ library(tidyverse)
 df <- read_csv("df.csv")
 
 
+
+#Fonction to understand the series
+
+fdecomp <- function(x, t = "additive"){
+stats::decompose(x, t = t)
+}
+
+fdecomp2 <- function(x){
+    mstl(x)
+}
+
+#Fonction of models
+
 farima <- function(x, h){
   forecast(auto.arima(x), h=h)
 }
@@ -34,4 +47,9 @@ farima <- function(x, h){
 fnnetar <- function(x, h){
   forecast(nnetar(x), h = h, PI = F)
 }
+
+fstlf <- function(x, h){
+    stlf(x, h = h)
+}
+
 

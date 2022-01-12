@@ -91,3 +91,8 @@ fit_df1 %>%
   labs(title = "Forecasting with classical additive decomposition of Handy_Lavera_Augusta_30") + scale_y_continuous(breaks=seq(-55000,55000,10000))
 
 fit_df1 %>% gg_tsresiduals()
+
+
+
+
+

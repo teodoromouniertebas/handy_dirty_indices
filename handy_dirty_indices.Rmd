@@ -24,6 +24,7 @@ Column {.sidebar}
 ------------------------------------------------------------------
 ```{r}
 selectInput(inputId = "Ind",label = "Indices", choices = IndChoices)
+sliderInput(inputId = "h",label = "Number of weeks to forecast ?", value = 52, min = 1, max = 260)
 ```
 
 Column {.tabset}
@@ -32,10 +33,19 @@ Column {.tabset}
 ### indices
 ```{r}
 renderPlotly({
- p <- updatedf() %>%
-  ggplot(aes(x=Date,y=!! rlang::sym(input$Ind))) +
-  geom_line() + theme_minimal() + scale_y_continuous(breaks=seq(-60000,60000,10000))
- ggplotly(p)
+p <- updatedf() %>% ggplot(aes(x=Date,y=!! rlang::sym(input$Ind))) +
+        geom_line() + ggtitle("Plot of the  Time-Series") + theme_bw() + scale_y_continuous(breaks=seq(-60000,60000,10000))
+
+    ggplotly(p)
+})
+```
+
+### Decomposition
+```{r}
+renderPlot({
+updatets() %>% fdecomp2() %>% autoplot() + xlab("") + ylab("") + 
+    ggtitle("Decomposition plot of the  Time-Series") + 
+    theme_bw()
 })
 ```
 
@@ -43,9 +53,21 @@ renderPlotly({
 ### Forcast
 ```{r}
 renderPlot({
-updatets() %>% farima(52) %>% plot()
+updatets() %>% fstlf(input$h) %>% autoplot() + 
+    ggtitle("Forecasting the Time-Series") + 
+    theme_bw()
 })
 ```
+
+
+### Residuals
+```{r}
+renderPlot({
+updatets() %>% fstlf(input$h) %>% checkresiduals(theme = theme_bw())
+  
+})
+```
+
 
 ### Data
 ```{r}

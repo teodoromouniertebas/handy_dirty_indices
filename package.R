@@ -28,13 +28,13 @@ df <- read_csv("df.csv")
 
 
 
-df <- df %>% dplyr::select(1,2)
+df <- df %>% dplyr::select(1,3)
 
 
 df %>% dplyr::select(-1) %>% ts(frequency = 52, start = c(2003, 6)) %>% farima(100) %>% forecast() %>% autoplot()
 
 updatets <- df %>% dplyr::select(-1) %>% ts(frequency = 52, start = c(2003, 6))
-fit_mod <- updatets %>% farima(100)
+fit_mod <- updatets %>% fnnetar(100)
 
 fit_mod %>% forecast() %>% plot()
 
